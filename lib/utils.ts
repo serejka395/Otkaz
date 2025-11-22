@@ -59,8 +59,22 @@ export function requireDatabase(res: any): boolean {
   }
 
   if (!normalize(process.env.DATABASE_URL)) {
+    const envPresence = {
+      databaseUrlPresent: !!normalize(process.env.DATABASE_URL),
+      netlifyDatabaseUrlPresent: !!normalize(process.env.NETLIFY_DATABASE_URL),
+      netlifyDatabaseUrlUnpooledPresent: !!normalize(process.env.NETLIFY_DATABASE_URL_UNPOOLED),
+    };
     try {
-      res.status(503).json({ error: 'Database not configured', code: 'DB_MISSING' });
+      res.status(503).json({
+        error: 'Database not configured',
+        code: 'DB_MISSING',
+        env: envPresence,
+      });
+    } catch {
+      /* ignore */
+    }
+    try {
+      console.warn('[requireDatabase] missing DATABASE_URL', envPresence);
     } catch {
       /* ignore */
     }
