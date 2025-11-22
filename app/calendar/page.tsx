@@ -99,7 +99,7 @@ export default function CalendarPage() {
     const todayTotalUSD = entries.reduce((sum, e) => sum + (e.usdAmount || 0), 0);
     const converted = convertCurrency(todayTotalUSD, user.currency || 'USD');
     setTodayTotal(converted);
-  }, [entries, user?.currency]);
+  }, [entries, user]);
 
   const handlePreset = (preset: UserPreset) => {
     setFormData({

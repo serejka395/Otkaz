@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import Navigation from '@/components/Navigation';
@@ -53,9 +53,9 @@ export default function GoalsPage() {
     }
     setUser(parsedUser);
     loadGoals(parsedUser.id);
-  }, [router]);
+  }, [router, loadGoals]);
 
-  const loadGoals = async (userId: string) => {
+  const loadGoals = useCallback(async (userId: string) => {
     if (isLoadingGoals) return;
     
     setIsLoadingGoals(true);
@@ -92,9 +92,9 @@ export default function GoalsPage() {
     } finally {
       setIsLoadingGoals(false);
     }
-  };
+  }, [createDefaultGoals, isLoadingGoals]);
 
-  const createDefaultGoals = async (userId: string) => {
+  const createDefaultGoals = useCallback(async (userId: string) => {
     try {
       const checkRes = await fetch(`/api/goals/check-exists?userId=${userId}`);
       const checkData = await checkRes.json();
@@ -148,7 +148,7 @@ export default function GoalsPage() {
     }
     
     setGoals(createdGoals);
-  };
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

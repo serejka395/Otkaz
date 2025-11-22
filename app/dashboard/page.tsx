@@ -358,7 +358,7 @@ export default function DashboardPage() {
               </h3>
 
               <p className="text-center text-gray-600 mb-6">
-                Why are you saying "Enough" to this?
+                Why are you saying “Enough” to this?
               </p>
 
               <div className="space-y-3 mb-6">

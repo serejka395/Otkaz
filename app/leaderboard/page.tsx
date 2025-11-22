@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import Navigation from '@/components/Navigation';
@@ -58,9 +58,9 @@ export default function LeaderboardPage() {
     setUser(parsedUser);
     loadLeaderboard(parsedUser.id);
     loadDailyTasks(parsedUser.id);
-  }, [router, selectedPeriod]);
+  }, [router, selectedPeriod, loadLeaderboard, loadDailyTasks]);
 
-  const loadLeaderboard = async (userId: string) => {
+  const loadLeaderboard = useCallback(async (userId: string) => {
     try {
       const res = await fetch(`/api/leaderboard?period=${selectedPeriod}`);
       const data = await res.json();
@@ -71,9 +71,9 @@ export default function LeaderboardPage() {
     } catch (error) {
       console.error('Failed to load leaderboard:', error);
     }
-  };
+  }, [selectedPeriod]);
 
-  const loadDailyTasks = async (userId: string) => {
+  const loadDailyTasks = useCallback(async (userId: string) => {
     try {
       const res = await fetch(`/api/daily-tasks?userId=${userId}`);
       const data = await res.json();
@@ -85,7 +85,7 @@ export default function LeaderboardPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   const completeTask = async (taskId: string) => {
     try {
