@@ -53,7 +53,7 @@ export function requireDatabase(res: any): boolean {
   // Check all possible database URL environment variables
   const connectionString =
     normalize(process.env.POSTGRES_PRISMA_URL) ||
-    normalize(process.env.POSTGRES_URL_NON_POOLING) ||
+    normalize(process.env.DATABASE_URL_UNPOOLED) ||
     normalize(process.env.DATABASE_URL) ||
     normalize(process.env.NETLIFY_DATABASE_URL) ||
     normalize(process.env.NETLIFY_DATABASE_URL_UNPOOLED);
@@ -66,7 +66,7 @@ export function requireDatabase(res: any): boolean {
   if (!connectionString) {
     const envPresence = {
       postgresPrismaUrlPresent: !!normalize(process.env.POSTGRES_PRISMA_URL),
-      postgresUrlNonPoolingPresent: !!normalize(process.env.POSTGRES_URL_NON_POOLING),
+      databaseUrlUnpooledPresent: !!normalize(process.env.DATABASE_URL_UNPOOLED),
       databaseUrlPresent: !!normalize(process.env.DATABASE_URL),
       netlifyDatabaseUrlPresent: !!normalize(process.env.NETLIFY_DATABASE_URL),
       netlifyDatabaseUrlUnpooledPresent: !!normalize(process.env.NETLIFY_DATABASE_URL_UNPOOLED),

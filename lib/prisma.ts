@@ -1,22 +1,18 @@
 import { PrismaClient } from '@prisma/client';
 
-// Map Netlify Neon env vars to Prisma expected DATABASE_URL at runtime if needed
+// Map environment variables to DATABASE_URL for Prisma
 if (!process.env.DATABASE_URL) {
-  const pooled = process.env.NETLIFY_DATABASE_URL;
-  const direct = process.env.NETLIFY_DATABASE_URL_UNPOOLED;
-  if (pooled || direct) {
-    process.env.DATABASE_URL = pooled || direct;
+  const connectionString =
+    process.env.POSTGRES_PRISMA_URL ||
+    process.env.DATABASE_URL_UNPOOLED ||
+    process.env.NETLIFY_DATABASE_URL ||
+    process.env.NETLIFY_DATABASE_URL_UNPOOLED;
+  if (connectionString) {
+    process.env.DATABASE_URL = connectionString;
   }
 }
 
-const connectionString =
-  process.env.POSTGRES_PRISMA_URL ||
-  process.env.DATABASE_URL ||
-  process.env.POSTGRES_URL_NON_POOLING ||
-  process.env.NETLIFY_DATABASE_URL ||
-  process.env.NETLIFY_DATABASE_URL_UNPOOLED;
-
-if (!connectionString) {
+if (!process.env.DATABASE_URL) {
   throw new Error('Database connection string is not configured');
 }
 
@@ -25,9 +21,6 @@ const globalForPrisma = globalThis as unknown as {
 };
 
 export const prisma =
-  globalForPrisma.prisma ??
-  new PrismaClient({
-    datasourceUrl: connectionString,
-  });
+  globalForPrisma.prisma ?? new PrismaClient();
 
 if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = prisma;
