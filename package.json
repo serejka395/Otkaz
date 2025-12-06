@@ -17,14 +17,14 @@
     "db:migrate": "prisma migrate dev"
   },
   "dependencies": {
-    "@prisma/client": "^7.0.1",
+    "@prisma/client": "^5.22.0",
     "@vercel/postgres": "^0.8.0",
     "bcryptjs": "^2.4.3",
     "date-fns": "^2.30.0",
     "framer-motion": "^10.16.4",
     "nanoid": "^5.0.3",
     "next": "14.2.33",
-    "prisma": "^7.0.1",
+    "prisma": "^5.22.0",
     "react": "^18",
     "react-dom": "^18",
     "react-hot-toast": "^2.4.1",
