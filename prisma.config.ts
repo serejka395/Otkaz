@@ -7,7 +7,7 @@ loadEnv({ path: '.env.local', override: false });
 const datasourceUrl =
   process.env.POSTGRES_PRISMA_URL ||
   process.env.DATABASE_URL ||
-  process.env.POSTGRES_URL_NON_POOLING;
+  process.env.DATABASE_URL_UNPOOLED;
 
 if (!datasourceUrl) {
   throw new Error('Database connection string is not set (POSTGRES_PRISMA_URL or DATABASE_URL)');
@@ -21,6 +21,6 @@ export default defineConfig({
   },
   datasource: {
     url: datasourceUrl,
-    shadowDatabaseUrl: process.env.POSTGRES_URL_NON_POOLING || datasourceUrl,
+    shadowDatabaseUrl: process.env.DATABASE_URL_UNPOOLED || datasourceUrl,
   },
 });
