@@ -16,7 +16,7 @@ export default function WhyPage() {
   const [presets, setPresets] = useState<UserPreset[]>([]);
   const [selectedPreset, setSelectedPreset] = useState<UserPreset | null>(null);
   const [showTagModal, setShowTagModal] = useState(false);
-  
+
   const { t } = useTranslation(user?.language || 'en');
 
   useEffect(() => {
@@ -34,32 +34,32 @@ export default function WhyPage() {
       if (preset.id === presetId) {
         const currentTags = preset.tags || [];
         const hasTag = currentTags.includes(tagId);
-        
+
         return {
           ...preset,
-          tags: hasTag 
+          tags: hasTag
             ? currentTags.filter(t => t !== tagId)
             : [...currentTags, tagId]
         };
       }
       return preset;
     });
-    
+
     setPresets(updatedPresets);
     saveUserPresets(user.id, updatedPresets);
-    
+
     if (selectedPreset && selectedPreset.id === presetId) {
       const updated = updatedPresets.find(p => p.id === presetId);
       if (updated) setSelectedPreset(updated);
     }
-    
+
     try {
       const res = await fetch('/api/achievements/check-tags', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ userId: user.id }),
       });
-      
+
       const data = await res.json();
       if (res.ok && data.newAchievements?.length > 0) {
         data.newAchievements.forEach((achievement: any) => {
@@ -88,7 +88,7 @@ export default function WhyPage() {
   return (
     <div className="pb-24 px-4 py-6 max-w-screen-lg mx-auto relative min-h-screen">
       <MathWallBackground />
-      
+
       <div className="enough-panel mb-6">
         <h1 className="text-3xl font-semibold tracking-tight mb-2 flex items-center gap-3">
           🤔 {t('whyTitle')}
@@ -108,7 +108,7 @@ export default function WhyPage() {
       <div className="space-y-3">
         {presets.map((preset) => {
           const tags = getPresetTags(preset);
-          
+
           return (
             <div key={preset.id} className="enough-card">
               <div className="flex items-start justify-between mb-3">
@@ -132,7 +132,7 @@ export default function WhyPage() {
                   {tags.map((tagId) => {
                     const tag = WHY_TAGS.find(t => t.id === tagId);
                     if (!tag) return null;
-                    
+
                     return (
                       <div key={tagId} className="enough-tag px-3 py-1 flex items-center gap-2">
                         <span className="text-lg">{tag.icon}</span>
@@ -156,7 +156,7 @@ export default function WhyPage() {
       {/* Tag Selection Modal */}
       {showTagModal && selectedPreset && (
         <div className="fixed inset-0 enough-modal-overlay flex items-center justify-center p-4 z-50">
-          <motion.div 
+          <motion.div
             className="enough-modal max-w-2xl w-full max-h-[80vh] overflow-y-auto elevation-2"
             initial={{ scale: 0.9, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
@@ -184,7 +184,7 @@ export default function WhyPage() {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               {WHY_TAGS.map((tag) => {
                 const isSelected = (selectedPreset.tags || []).includes(tag.id);
-                
+
                 return (
                   <button
                     key={tag.id}
@@ -192,8 +192,8 @@ export default function WhyPage() {
                     className={`p-4  font-semibold tracking-tight text-left transition-all
                       ${isSelected ? 'bg-white' : 'bg-white hover:bg-white'}`}
                     style={{
-                      boxShadow: isSelected 
-                        ? '0 2px 6px rgba(0,0,0,0.06), 0 4px 12px rgba(0,0,0,0.06)' 
+                      boxShadow: isSelected
+                        ? '0 2px 6px rgba(0,0,0,0.06), 0 4px 12px rgba(0,0,0,0.06)'
                         : '0 1px 3px rgba(0,0,0,0.04)',
                     }}
                   >
@@ -215,14 +215,14 @@ export default function WhyPage() {
                   setShowTagModal(false);
                   setSelectedPreset(null);
                   toast.success(t('tagsSaved') + ' ✅');
-                  
+
                   try {
                     const res = await fetch('/api/achievements/check-tags', {
                       method: 'POST',
                       headers: { 'Content-Type': 'application/json' },
                       body: JSON.stringify({ userId: user.id }),
                     });
-                    
+
                     const data = await res.json();
                     if (res.ok && data.newAchievements?.length > 0) {
                       setTimeout(() => {

@@ -25,7 +25,7 @@ export default function ProfilePage() {
   const [usernameAvailable, setUsernameAvailable] = useState<boolean | null>(null);
   const [isCheckingUsername, setIsCheckingUsername] = useState(false);
   const [showPasswordForm, setShowPasswordForm] = useState(false);
-  
+
   const { t } = useTranslation(user?.language || 'en');
 
   useEffect(() => {
@@ -76,22 +76,22 @@ export default function ProfilePage() {
     const feedback: string[] = [];
 
     if (password.length >= 8) score += 1;
-    else feedback.push('Use at least 8 characters');
+    else feedback.push(t('passwordTipMinChars'));
 
     if (password.length >= 12) score += 1;
-    else feedback.push('Use 12+ characters for better security');
+    else feedback.push(t('passwordTipTwelveChars'));
 
     if (/[a-z]/.test(password)) score += 1;
-    else feedback.push('Add lowercase letters');
+    else feedback.push(t('passwordTipLower'));
 
     if (/[A-Z]/.test(password)) score += 1;
-    else feedback.push('Add  letters');
+    else feedback.push(t('passwordTipUpper'));
 
     if (/\d/.test(password)) score += 1;
-    else feedback.push('Add numbers');
+    else feedback.push(t('passwordTipNumbers'));
 
     if (/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password)) score += 1;
-    else feedback.push('Add special characters');
+    else feedback.push(t('passwordTipSpecial'));
 
     if (password.length >= 16) score += 1;
 
@@ -117,11 +117,11 @@ export default function ProfilePage() {
       // Добавляем пароль, если он указан
       if (newPassword) {
         if (newPassword !== confirmPassword) {
-          toast.error('Passwords do not match');
+          toast.error(t('passwordsNoMatch'));
           return;
         }
         if (passwordStrength.score < 3) {
-          toast.error('Password is too weak');
+          toast.error(t('passwordTooWeak'));
           return;
         }
         updates.password = newPassword;
@@ -145,15 +145,15 @@ export default function ProfilePage() {
         setUser(updatedUser);
         setEditMode(false);
         setShowPasswordForm(false);
-        
+
         // Очищаем формы
         setCurrentPassword('');
         setNewPassword('');
         setConfirmPassword('');
         setPasswordStrength({ score: 0, feedback: [] });
-        
+
         toast.success('Profile updated successfully! ✅');
-        
+
         // Trigger storage event to notify other components
         window.dispatchEvent(new Event('storage'));
       } else {
@@ -264,7 +264,7 @@ export default function ProfilePage() {
 
         <div className="space-y-4">
           <div>
-            <label className="block text-sm font-bold mb-2">Display Name</label>
+            <label className="block text-sm font-bold mb-2">{t('displayName')}</label>
             <input
               type="text"
               value={name}
@@ -276,7 +276,7 @@ export default function ProfilePage() {
           </div>
 
           <div>
-            <label className="block text-sm font-bold mb-2">Username</label>
+            <label className="block text-sm font-bold mb-2">{t('username')}</label>
             <div className="relative">
               <input
                 type="text"
@@ -302,10 +302,10 @@ export default function ProfilePage() {
               )}
             </div>
             {username && username !== user?.username && usernameAvailable === false && (
-              <p className="text-red-600 text-sm mt-1">Username is already taken</p>
+              <p className="text-red-600 text-sm mt-1">{t('usernameTaken')}</p>
             )}
             {username && username !== user?.username && usernameAvailable === true && (
-              <p className="text-green-600 text-sm mt-1">Username is available</p>
+              <p className="text-green-600 text-sm mt-1">{t('usernameAvailable')}</p>
             )}
           </div>
 
@@ -344,17 +344,17 @@ export default function ProfilePage() {
                 onClick={() => setShowPasswordForm(!showPasswordForm)}
                 className="enough-button-cyan w-full elevation-2"
               >
-                🔒 {showPasswordForm ? 'Hide Password Change' : 'Change Password'}
+                🔒 {showPasswordForm ? t('hidePasswordChange') : t('changePassword')}
               </button>
             </div>
           )}
 
           {showPasswordForm && (
             <div className="space-y-4 p-4 bg-gray-100 border-0 ">
-              <h3 className="text-lg font-bold">Change Password</h3>
-              
+              <h3 className="text-lg font-bold">{t('changePassword')}</h3>
+
               <div>
-                <label className="block text-sm font-bold mb-2">Current Password</label>
+                <label className="block text-sm font-bold mb-2">{t('currentPassword')}</label>
                 <input
                   type="password"
                   value={currentPassword}
@@ -365,7 +365,7 @@ export default function ProfilePage() {
               </div>
 
               <div>
-                <label className="block text-sm font-bold mb-2">New Password</label>
+                <label className="block text-sm font-bold mb-2">{t('newPassword')}</label>
                 <input
                   type="password"
                   value={newPassword}
@@ -379,20 +379,19 @@ export default function ProfilePage() {
                 {newPassword && (
                   <div className="mt-2">
                     <div className="flex items-center gap-2 mb-1">
-                      <span className="text-sm font-bold">Strength:</span>
+                      <span className="text-sm font-bold">{t('passwordStrength')}:</span>
                       <div className="flex gap-1">
                         {[1, 2, 3, 4, 5, 6].map((level) => (
                           <div
                             key={level}
-                            className={`w-4 h-2 border-0 ${
-                              level <= passwordStrength.score
-                                ? level <= 2
-                                  ? 'bg-red-500'
-                                  : level <= 4
+                            className={`w-4 h-2 border-0 ${level <= passwordStrength.score
+                              ? level <= 2
+                                ? 'bg-red-500'
+                                : level <= 4
                                   ? 'bg-yellow-500'
                                   : 'bg-green-500'
-                                : 'bg-gray-300'
-                            }`}
+                              : 'bg-gray-300'
+                              }`}
                           />
                         ))}
                       </div>
@@ -409,7 +408,7 @@ export default function ProfilePage() {
               </div>
 
               <div>
-                <label className="block text-sm font-bold mb-2">Confirm New Password</label>
+                <label className="block text-sm font-bold mb-2">{t('confirmNewPassword')}</label>
                 <input
                   type="password"
                   value={confirmPassword}
@@ -418,7 +417,7 @@ export default function ProfilePage() {
                   className="w-full px-4 py-3 border-0 elevation-2"
                 />
                 {confirmPassword && newPassword !== confirmPassword && (
-                  <p className="text-red-600 text-sm mt-1">Passwords do not match</p>
+                  <p className="text-red-600 text-sm mt-1">{t('passwordsNoMatch')}</p>
                 )}
               </div>
             </div>

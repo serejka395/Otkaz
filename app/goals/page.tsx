@@ -42,14 +42,14 @@ export default function GoalsPage() {
     name: '',
     targetAmount: '',
   });
-  
+
   const { t } = useTranslation(user?.language || 'en');
 
   const createDefaultGoals = useCallback(async (userId: string) => {
     try {
       const checkRes = await fetch(`/api/goals/check-exists?userId=${userId}`);
       const checkData = await checkRes.json();
-      
+
       if (checkData.exists) {
         const res = await fetch(`/api/goals/list?userId=${userId}`);
         const data = await res.json();
@@ -75,7 +75,7 @@ export default function GoalsPage() {
       console.error('Failed to check existing goals:', error);
       return;
     }
-    
+
     const createdGoals = [];
     for (const goal of DEFAULT_GOALS) {
       try {
@@ -97,13 +97,13 @@ export default function GoalsPage() {
         console.error('Failed to create default goal:', error);
       }
     }
-    
+
     setGoals(createdGoals);
   }, []);
 
   const loadGoals = useCallback(async (userId: string) => {
     if (isLoadingGoals) return;
-    
+
     setIsLoadingGoals(true);
     try {
       const res = await fetch(`/api/goals/list?userId=${userId}`);
@@ -127,7 +127,7 @@ export default function GoalsPage() {
         }
         setGoals(uniqueGoals);
         setTotalSavings(data.totalSavings);
-        
+
         if (data.goals.length === 0 && !localStorage.getItem(`defaultGoalsCreated_${userId}`)) {
           await createDefaultGoals(userId);
           localStorage.setItem(`defaultGoalsCreated_${userId}`, 'true');
@@ -185,9 +185,9 @@ export default function GoalsPage() {
       toast.error('Add some refusals first to see Crypto ROI!');
       return;
     }
-    
+
     setLoadingCrypto(true);
-    
+
     try {
       const res = await fetch(`/api/crypto/roi?amount=${totalSavings}`);
       const data = await res.json();
@@ -211,8 +211,8 @@ export default function GoalsPage() {
   return (
     <div className="pb-24 px-4 py-6 max-w-screen-lg mx-auto relative min-h-screen">
       <MathWallBackground />
-      
-      <motion.div 
+
+      <motion.div
         className="enough-panel mb-6 elevation-2"
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -230,12 +230,12 @@ export default function GoalsPage() {
 
       <div className="enough-panel mb-6">
         <div className="flex justify-between items-center mb-4">
-          <h2 className="text-2xl font-semibold ">Active Goals</h2>
+          <h2 className="text-2xl font-semibold ">{t('activeGoals')}</h2>
           <button
             onClick={() => setShowForm(true)}
             className="enough-button-primary px-4 py-2 text-sm elevation-2"
           >
-            ➕ New
+            ➕ {t('new')}
           </button>
         </div>
 
@@ -249,19 +249,19 @@ export default function GoalsPage() {
               const progress = Math.min((totalSavings / goal.usdTarget) * 100, 100);
               const convertedSavings = convertCurrency(totalSavings, user.currency);
               const convertedTarget = convertCurrency(goal.usdTarget, user.currency);
-              
+
               return (
-                <div 
-                  key={goal.id} 
+                <div
+                  key={goal.id}
                   className="bg-white p-4 transition-all hover:shadow-[0_0_20px_rgba(245,198,26,0.6),0_4px_0px_#000] elevation-2"
-                  
+
                 >
                   {progress >= 100 && (
                     <div className="bg-green-200 border-2 border-green-600 p-2 mb-3 text-center">
                       <span className="font-semibold text-green-800">🎉 GOAL ACHIEVED! 🎉</span>
                     </div>
                   )}
-                  
+
                   <div className="flex justify-between items-start mb-3">
                     <div>
                       <h3 className="font-semibold text-lg tracking-tight">{goal.name}</h3>
@@ -299,17 +299,17 @@ export default function GoalsPage() {
               {t('yourSavings')}: <span className="font-semibold">{formatCurrency(convertCurrency(totalSavings, user.currency), user.currency)}</span>
             </p>
             <p className="text-xs font-bold text-gray-600">
-              See what this would be worth if you invested in top cryptocurrencies 5 years ago!
+              {t('seeCryptoROI')}
             </p>
           </div>
-          
+
           {!showCrypto ? (
             <button
               onClick={loadCryptoROI}
               disabled={loadingCrypto}
               className="enough-button w-full py-4 text-lg elevation-2"
             >
-              {loadingCrypto ? '⏳ CALCULATING...' : '🚀 CALCULATE CRYPTO ROI'}
+              {loadingCrypto ? '⏳ ' + t('calculating') : '🚀 ' + t('calculateCryptoROI')}
             </button>
           ) : (
             <div className="space-y-3">
@@ -322,7 +322,7 @@ export default function GoalsPage() {
                     const convertedOriginal = convertCurrency(totalSavings, user.currency);
                     const profit = convertedYourValue - convertedOriginal;
                     const roiPercent = ((crypto.multiplier - 1) * 100).toFixed(0);
-                    
+
                     alert(`🔥 ${crypto.name} (${crypto.symbol})
 
 📊 Performance:
@@ -362,10 +362,10 @@ export default function GoalsPage() {
                   </div>
                 </div>
               ))}
-              
+
               <div className="bg-white p-4 mt-4 transition-all hover:shadow-[0_0_20px_rgba(245,198,26,0.6)]">
                 <div className="text-sm font-bold text-center text-gray-900">
-                  💎 Best performer: <span className="font-semibold">{cryptoData[0]?.symbol}</span> ({cryptoData[0]?.multiplier.toFixed(1)}x)
+                  💎 {t('bestPerformer')}: <span className="font-semibold">{cryptoData[0]?.symbol}</span> ({cryptoData[0]?.multiplier.toFixed(1)}x)
                 </div>
               </div>
             </div>
@@ -375,53 +375,53 @@ export default function GoalsPage() {
 
       <AnimatePresence>
         {showForm && (
-          <motion.div 
+          <motion.div
             className="fixed inset-0 enough-modal-overlay flex items-center justify-center p-4 z-50 elevation-2"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
           >
-            <motion.div 
+            <motion.div
               className="enough-modal max-w-md w-full elevation-2"
               initial={{ scale: 0.9, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.9, opacity: 0 }}
             >
-            <h2 className="text-2xl font-semibold mb-4">{t('createGoal')}</h2>
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <input
-                type="text"
-                placeholder={t('goalName')}
-                value={formData.name}
-                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                required
-                className="w-full px-4 py-3 elevation-2"
-              />
-              <input
-                type="number"
-                step="0.01"
-                placeholder={t('targetAmount')}
-                value={formData.targetAmount}
-                onChange={(e) => setFormData({ ...formData, targetAmount: e.target.value })}
-                required
-                className="w-full px-4 py-3 elevation-2"
-              />
-              <div className="flex gap-2">
-                <button 
-                  type="submit" 
-                  className="flex-1 enough-button-primary elevation-2"
-                >
-                  {t('save')}
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setShowForm(false)}
-                  className="flex-1 enough-button-secondary elevation-2"
-                >
-                  {t('cancel')}
-                </button>
-              </div>
-            </form>
+              <h2 className="text-2xl font-semibold mb-4">{t('createGoal')}</h2>
+              <form onSubmit={handleSubmit} className="space-y-4">
+                <input
+                  type="text"
+                  placeholder={t('goalName')}
+                  value={formData.name}
+                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                  required
+                  className="w-full px-4 py-3 elevation-2"
+                />
+                <input
+                  type="number"
+                  step="0.01"
+                  placeholder={t('targetAmount')}
+                  value={formData.targetAmount}
+                  onChange={(e) => setFormData({ ...formData, targetAmount: e.target.value })}
+                  required
+                  className="w-full px-4 py-3 elevation-2"
+                />
+                <div className="flex gap-2">
+                  <button
+                    type="submit"
+                    className="flex-1 enough-button-primary elevation-2"
+                  >
+                    {t('save')}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setShowForm(false)}
+                    className="flex-1 enough-button-secondary elevation-2"
+                  >
+                    {t('cancel')}
+                  </button>
+                </div>
+              </form>
             </motion.div>
           </motion.div>
         )}

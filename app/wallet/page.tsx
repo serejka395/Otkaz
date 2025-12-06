@@ -19,8 +19,8 @@ export default function WalletPage() {
     month: 0,
     allTime: 0,
   });
-  const [topTags, setTopTags] = useState<Array<{tagId: string; count: number}>>([]);
-  
+  const [topTags, setTopTags] = useState<Array<{ tagId: string; count: number }>>([]);
+
   const { t } = useTranslation(user?.language || 'en');
 
   useEffect(() => {
@@ -33,7 +33,7 @@ export default function WalletPage() {
     setUserPoints(Number(parsedUser.points) || 0);
     loadStats(parsedUser.id);
     loadTopTags(parsedUser.id);
-    
+
     // Reload stats when page becomes visible
     const handleVisibilityChange = () => {
       if (!document.hidden && parsedUser) {
@@ -41,7 +41,7 @@ export default function WalletPage() {
         loadStats(parsedUser.id);
       }
     };
-    
+
     document.addEventListener('visibilitychange', handleVisibilityChange);
     return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
   }, [router]);
@@ -61,11 +61,11 @@ export default function WalletPage() {
         month: month.totalUSD || 0,
         allTime: all.totalUSD || 0,
       };
-      
+
       setStats(newStats);
-      
+
       console.log(`Wallet stats loaded: Today ${newStats.today} USD, All time ${newStats.allTime} USD`);
-      
+
       // Update points from user object, not from totalUSD
       const currentUser = getUserFromStorage();
       if (currentUser) {
@@ -80,7 +80,7 @@ export default function WalletPage() {
     try {
       const presets = getUserPresets(userId);
       const tagCounts: Record<string, number> = {};
-      
+
       presets.forEach(preset => {
         if (preset.tags && preset.tags.length > 0) {
           preset.tags.forEach(tag => {
@@ -88,12 +88,12 @@ export default function WalletPage() {
           });
         }
       });
-      
+
       const sorted = Object.entries(tagCounts)
         .map(([tagId, count]) => ({ tagId, count }))
         .sort((a, b) => b.count - a.count)
         .slice(0, 5);
-      
+
       setTopTags(sorted);
     } catch (error) {
       console.error('Failed to load top tags:', error);
@@ -114,14 +114,14 @@ export default function WalletPage() {
     { name: t('today'), amount: convertedStats.today },
     { name: t('thisWeek'), amount: convertedStats.week },
     { name: t('thisMonth'), amount: convertedStats.month },
-    { name: 'All Time', amount: convertedStats.allTime },
+    { name: t('periodAllTime'), amount: convertedStats.allTime },
   ];
 
   return (
     <div className="pb-24 px-4 py-6 max-w-screen-lg mx-auto">
       <div className="enough-panel mb-6">
         <h1 className="text-4xl font-bold mb-4">💰 {t('yourWallet')}</h1>
-        
+
         <div className="bg-white border-0 p-6 mb-6 enough-shadow-lg">
           <div className="text-center">
             <p className="text-gray-900 text-lg mb-2">{t('totalSavings')}</p>
@@ -173,14 +173,14 @@ export default function WalletPage() {
             {topTags.map(({ tagId, count }, index) => {
               const tag = WHY_TAGS.find(t => t.id === tagId);
               if (!tag) return null;
-              
+
               return (
                 <div
                   key={tagId}
                   className={`px-4 py-2 border-0  font-semibold flex items-center gap-2 
                     ${tag.color} transition-all hover:scale-105 hover:rotate-2 hover:enough-shadow-lg
                     animate-[popIn_0.5s_ease-out]`}
-                  style={{ 
+                  style={{
                     animationDelay: `${index * 0.1}s`,
                     transformStyle: 'preserve-3d'
                   }}

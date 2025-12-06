@@ -255,16 +255,16 @@ export default function DashboardPage() {
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <div className="text-sm text-gray-600 mb-1">Points</div>
+              <div className="text-sm text-gray-600 mb-1">{t('points')}</div>
               <div className="text-3xl font-bold text-gray-900">{user.points || 0}</div>
               {nextRank && (
                 <div className="text-xs text-gray-500 mt-1">
-                  {pointsToNext} to {nextRank.name}
+                  {pointsToNext} {t('pointsTo')} {nextRank.name}
                 </div>
               )}
             </div>
             <div>
-              <div className="text-sm text-gray-600 mb-1">Total Saved</div>
+              <div className="text-sm text-gray-600 mb-1">{t('totalSavings')}</div>
               <div
                 className="text-3xl font-bold"
                 style={{
@@ -288,7 +288,7 @@ export default function DashboardPage() {
         className="enough-panel mb-6"
       >
         <h2 className="text-2xl font-semibold tracking-tight mb-4 flex items-center gap-2">
-          ⚡ Quick Add
+          ⚡ {t('quickAdd')}
         </h2>
         <div className="grid grid-cols-4 gap-3">
           {presets.slice(0, 8).map((preset) => (
@@ -358,7 +358,7 @@ export default function DashboardPage() {
               </h3>
 
               <p className="text-center text-gray-600 mb-6">
-                Why are you saying “Enough” to this?
+                {t('whatDidYouRefuse')}
               </p>
 
               <div className="space-y-3 mb-6">
@@ -376,11 +376,10 @@ export default function DashboardPage() {
                           : [...currentTags, tag.id];
                         setSelectedPreset({ ...selectedPreset, tags: newTags });
                       }}
-                      className={`w-full p-5 rounded-xl font-bold transition-all text-base ${
-                        isSelected
-                          ? tag.color
-                          : 'bg-gray-100 text-gray-700 border-2 border-gray-300'
-                      }`}
+                      className={`w-full p-5 rounded-xl font-bold transition-all text-base ${isSelected
+                        ? tag.color
+                        : 'bg-gray-100 text-gray-700 border-2 border-gray-300'
+                        }`}
                     >
                       <div className="flex items-center justify-between">
                         <span className="flex items-center gap-3">
@@ -399,7 +398,7 @@ export default function DashboardPage() {
                   onClick={() => setShowTagModal(false)}
                   className="flex-1 bg-gray-200 text-gray-900 py-4 px-6 rounded-xl font-bold hover:bg-gray-300 transition-colors text-base"
                 >
-                  ❌ Cancel
+                  ❌ {t('cancel')}
                 </button>
                 <button
                   onClick={() => handleAddEntry(selectedPreset.tags || [])}
@@ -410,7 +409,7 @@ export default function DashboardPage() {
                     boxShadow: '0 4px 12px rgba(245, 198, 26, 0.4)',
                   }}
                 >
-                  ✅ Add Entry
+                  ✅ {t('add')}
                 </button>
               </div>
             </motion.div>

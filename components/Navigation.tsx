@@ -3,6 +3,9 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { motion } from 'framer-motion';
+import { useTranslation } from '@/lib/i18n';
+import { getUserFromStorage } from '@/lib/user-sync';
+import { useState, useEffect } from 'react';
 
 /**
  * Navigation bar configuration.
@@ -16,41 +19,46 @@ import { motion } from 'framer-motion';
 const navItems = [
   {
     href: '/calendar',
-    // calendar icon: a simple wall calendar 📆 looks more professional than the tear‑off style
     icon: '📆',
-    label: { en: 'Calendar', ru: 'Календарь' },
+    labelKey: 'navCalendar',
   },
   {
     href: '/goals',
-    // target icon 🎯 conveys goal setting but retains a clean look
     icon: '🎯',
-    label: { en: 'Goals', ru: 'Цели' },
+    labelKey: 'navGoals',
   },
   {
     href: '/dashboard',
-    // briefcase 💼 represents work/business and is more premium than a diamond
     icon: '💼',
-    label: { en: 'Dashboard', ru: 'Панель' },
+    labelKey: 'navDashboard',
   },
   {
     href: '/leaderboard',
-    // medal 🥇 suits the competitive nature of a leaderboard
     icon: '🥇',
-    label: { en: 'Leaders', ru: 'Лидеры' },
+    labelKey: 'navLeaders',
   },
   {
     href: '/why',
-    // light bulb 💡 symbolises insight and reasons behind choices
     icon: '💡',
-    label: { en: 'Why', ru: 'Причины' },
+    labelKey: 'navWhy',
   },
 ];
 
 export default function Navigation() {
   const pathname = usePathname();
+  const [lang, setLang] = useState<'en' | 'ru'>('en');
+
+  useEffect(() => {
+    const user = getUserFromStorage();
+    if (user?.language) {
+      setLang(user.language as 'en' | 'ru');
+    }
+  }, []);
+
+  const { t } = useTranslation(lang);
 
   return (
-    <nav 
+    <nav
       className="fixed bottom-0 left-0 right-0 z-50 pb-safe"
       style={{
         background: 'rgba(255, 255, 255, 0.8)',
@@ -63,7 +71,7 @@ export default function Navigation() {
       <div className="flex justify-around items-center px-2 safe-area-inset-bottom">
         {navItems.map((item) => {
           const isActive = pathname === item.href;
-          
+
           return (
             <Link
               key={item.href}
@@ -121,12 +129,12 @@ export default function Navigation() {
               {/* Label */}
               <span
                 className={`text-[10px] sm:text-xs font-medium tracking-tight relative z-10 transition-all duration-200
-                  ${isActive 
-                    ? 'text-gray-900' 
+                  ${isActive
+                    ? 'text-gray-900'
                     : 'text-gray-500 group-hover:text-gray-700'
                   }`}
               >
-                {item.label.en}
+                {t(item.labelKey)}
               </span>
 
               {/* Hover effect for inactive items */}

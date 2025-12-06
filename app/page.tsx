@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { CURRENCIES_ARRAY } from '@/lib/currencies';
-import { translations, Language } from '@/lib/translations';
+import { useTranslation, Language } from '@/lib/i18n';
 
 export default function HomePage() {
   const router = useRouter();
@@ -14,7 +14,7 @@ export default function HomePage() {
   const [name, setName] = useState('');
   const [referralCode, setReferralCode] = useState('');
   const [currency, setCurrency] = useState('USD');
-  const [language, setLanguage] = useState<Language>('en');
+  const [language, setLanguage] = useState('en');
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
@@ -30,7 +30,7 @@ export default function HomePage() {
   //   if (browserLang === 'ru') setLanguage('ru');
   // }, []);
 
-  const t = translations[language];
+  const { t } = useTranslation(language as any);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -127,7 +127,7 @@ export default function HomePage() {
             animate={{ scale: 1, opacity: 1 }}
             transition={{ duration: 0.6, delay: 0.2 }}
           >
-            {t.hero.title}
+            {t('heroTitle')}
             <span className="text-gradient-enough">.</span>
           </motion.h1>
 
@@ -142,7 +142,7 @@ export default function HomePage() {
             animate={{ opacity: 1 }}
             transition={{ duration: 0.6, delay: 0.4 }}
           >
-            {t.hero.tagline}
+            {t('heroTagline')}
           </motion.p>
 
           <motion.p
@@ -151,7 +151,7 @@ export default function HomePage() {
             animate={{ opacity: 1 }}
             transition={{ duration: 0.6, delay: 0.5 }}
           >
-            {t.hero.subtext}
+            {t('heroSubtext')}
           </motion.p>
         </motion.div>
 
@@ -177,20 +177,20 @@ export default function HomePage() {
               <button
                 onClick={() => setIsLogin(true)}
                 className={`flex-1 py-3 px-4 rounded-lg font-medium text-sm transition-all duration-200 ${isLogin
-                    ? 'bg-white text-gray-900 shadow-sm'
-                    : 'text-gray-600 hover:text-gray-900'
+                  ? 'bg-white text-gray-900 shadow-sm'
+                  : 'text-gray-600 hover:text-gray-900'
                   }`}
               >
-                {t.auth.signInTab}
+                {t('signInTab')}
               </button>
               <button
                 onClick={() => setIsLogin(false)}
                 className={`flex-1 py-3 px-4 rounded-lg font-medium text-sm transition-all duration-200 ${!isLogin
-                    ? 'bg-white text-gray-900 shadow-sm'
-                    : 'text-gray-600 hover:text-gray-900'
+                  ? 'bg-white text-gray-900 shadow-sm'
+                  : 'text-gray-600 hover:text-gray-900'
                   }`}
               >
-                {t.auth.signUpTab}
+                {t('signUpTab')}
               </button>
             </div>
 
@@ -206,7 +206,7 @@ export default function HomePage() {
                   >
                     <input
                       type="text"
-                      placeholder={t.auth.namePlaceholder}
+                      placeholder={t('namePlaceholder')}
                       value={name}
                       onChange={(e) => setName(e.target.value)}
                       className="w-full px-4 py-3 text-base"
@@ -218,7 +218,7 @@ export default function HomePage() {
 
               <input
                 type="email"
-                placeholder={t.auth.emailPlaceholder}
+                placeholder={t('emailPlaceholder')}
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 className="w-full px-4 py-3 text-base"
@@ -227,7 +227,7 @@ export default function HomePage() {
 
               <input
                 type="password"
-                placeholder={t.auth.passwordPlaceholder}
+                placeholder={t('passwordPlaceholder')}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 className="w-full px-4 py-3 text-base"
@@ -245,7 +245,7 @@ export default function HomePage() {
                   >
                     <input
                       type="text"
-                      placeholder={t.auth.referralPlaceholder}
+                      placeholder={t('referralPlaceholder')}
                       value={referralCode}
                       onChange={(e) => setReferralCode(e.target.value)}
                       className="w-full px-4 py-3 text-base"
@@ -294,7 +294,7 @@ export default function HomePage() {
                 disabled={isLoading}
                 className="enough-button-primary w-full py-4 text-base font-medium disabled:opacity-50 disabled:cursor-not-allowed mt-6"
               >
-                {isLoading ? t.auth.loading : isLogin ? t.auth.signInButton : t.auth.createAccountButton}
+                {isLoading ? t('loading') : isLogin ? t('signInButton') : t('createAccountButton')}
               </button>
             </form>
           </div>
@@ -308,9 +308,9 @@ export default function HomePage() {
           className="grid grid-cols-3 gap-4 mt-12 max-w-2xl"
         >
           {[
-            { icon: '✋', text: t.features.sayEnough },
-            { icon: '💎', text: t.features.buildWealth },
-            { icon: '🎯', text: t.features.reachGoals },
+            { icon: '✋', text: t('sayEnough') },
+            { icon: '💎', text: t('buildWealth') },
+            { icon: '🎯', text: t('reachGoals') },
           ].map((item, i) => (
             <motion.div
               key={i}
