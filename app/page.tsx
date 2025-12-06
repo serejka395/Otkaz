@@ -19,6 +19,19 @@ export default function HomePage() {
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
+    // Check for referral code in URL (dev/web) or Telegram initData
+    const params = new URLSearchParams(window.location.search);
+    const urlRef = params.get('ref') || params.get('start');
+
+    // Check Telegram WebApp initData
+    let telegramRef = '';
+    if (typeof window !== 'undefined' && (window as any).Telegram?.WebApp?.initDataUnsafe?.start_param) {
+      telegramRef = (window as any).Telegram.WebApp.initDataUnsafe.start_param;
+    }
+
+    if (urlRef) setReferralCode(urlRef);
+    else if (telegramRef) setReferralCode(telegramRef);
+
     const user = localStorage.getItem('user');
     if (user) {
       router.push('/calendar');

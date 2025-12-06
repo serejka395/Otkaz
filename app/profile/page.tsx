@@ -170,7 +170,11 @@ export default function ProfilePage() {
   };
 
   const copyReferralLink = () => {
-    const link = `${window.location.origin}/?ref=${user.referralCode}`;
+    const botUsername = process.env.NEXT_PUBLIC_BOT_USERNAME;
+    const link = botUsername
+      ? `https://t.me/${botUsername}?start=${user.referralCode}`
+      : `${window.location.origin}/?ref=${user.referralCode}`;
+
     navigator.clipboard.writeText(link);
     toast.success(t('referralLinkCopied') + ' 📋');
   };
