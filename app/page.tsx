@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { CURRENCIES_ARRAY } from '@/lib/currencies';
+import { translations, Language } from '@/lib/translations';
 
 export default function HomePage() {
   const router = useRouter();
@@ -13,7 +14,7 @@ export default function HomePage() {
   const [name, setName] = useState('');
   const [referralCode, setReferralCode] = useState('');
   const [currency, setCurrency] = useState('USD');
-  const [language, setLanguage] = useState('en');
+  const [language, setLanguage] = useState<Language>('en');
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
@@ -22,6 +23,14 @@ export default function HomePage() {
       router.push('/calendar');
     }
   }, [router]);
+
+  // Handle browser language detection on first load (optional, keeping it simple for now)
+  // useEffect(() => {
+  //   const browserLang = navigator.language.split('-')[0];
+  //   if (browserLang === 'ru') setLanguage('ru');
+  // }, []);
+
+  const t = translations[language];
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -96,7 +105,7 @@ export default function HomePage() {
 
       {/* Content */}
       <div className="relative z-10 min-h-screen flex flex-col items-center justify-center p-4 sm:p-6">
-        
+
         {/* Hero Section */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
@@ -118,7 +127,7 @@ export default function HomePage() {
             animate={{ scale: 1, opacity: 1 }}
             transition={{ duration: 0.6, delay: 0.2 }}
           >
-            ENOUGH
+            {t.hero.title}
             <span className="text-gradient-enough">.</span>
           </motion.h1>
 
@@ -133,7 +142,7 @@ export default function HomePage() {
             animate={{ opacity: 1 }}
             transition={{ duration: 0.6, delay: 0.4 }}
           >
-            Enough to change your life
+            {t.hero.tagline}
           </motion.p>
 
           <motion.p
@@ -142,7 +151,7 @@ export default function HomePage() {
             animate={{ opacity: 1 }}
             transition={{ duration: 0.6, delay: 0.5 }}
           >
-            Track your savings, reach your goals, and build wealth one small decision at a time
+            {t.hero.subtext}
           </motion.p>
         </motion.div>
 
@@ -167,23 +176,21 @@ export default function HomePage() {
             <div className="flex gap-2 mb-8 p-1 rounded-xl" style={{ background: 'rgba(0, 0, 0, 0.04)' }}>
               <button
                 onClick={() => setIsLogin(true)}
-                className={`flex-1 py-3 px-4 rounded-lg font-medium text-sm transition-all duration-200 ${
-                  isLogin
+                className={`flex-1 py-3 px-4 rounded-lg font-medium text-sm transition-all duration-200 ${isLogin
                     ? 'bg-white text-gray-900 shadow-sm'
                     : 'text-gray-600 hover:text-gray-900'
-                }`}
+                  }`}
               >
-                Sign In
+                {t.auth.signInTab}
               </button>
               <button
                 onClick={() => setIsLogin(false)}
-                className={`flex-1 py-3 px-4 rounded-lg font-medium text-sm transition-all duration-200 ${
-                  !isLogin
+                className={`flex-1 py-3 px-4 rounded-lg font-medium text-sm transition-all duration-200 ${!isLogin
                     ? 'bg-white text-gray-900 shadow-sm'
                     : 'text-gray-600 hover:text-gray-900'
-                }`}
+                  }`}
               >
-                Sign Up
+                {t.auth.signUpTab}
               </button>
             </div>
 
@@ -199,7 +206,7 @@ export default function HomePage() {
                   >
                     <input
                       type="text"
-                      placeholder="Name"
+                      placeholder={t.auth.namePlaceholder}
                       value={name}
                       onChange={(e) => setName(e.target.value)}
                       className="w-full px-4 py-3 text-base"
@@ -211,7 +218,7 @@ export default function HomePage() {
 
               <input
                 type="email"
-                placeholder="Email"
+                placeholder={t.auth.emailPlaceholder}
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 className="w-full px-4 py-3 text-base"
@@ -220,7 +227,7 @@ export default function HomePage() {
 
               <input
                 type="password"
-                placeholder="Password"
+                placeholder={t.auth.passwordPlaceholder}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 className="w-full px-4 py-3 text-base"
@@ -238,7 +245,7 @@ export default function HomePage() {
                   >
                     <input
                       type="text"
-                      placeholder="Referral Code (optional)"
+                      placeholder={t.auth.referralPlaceholder}
                       value={referralCode}
                       onChange={(e) => setReferralCode(e.target.value)}
                       className="w-full px-4 py-3 text-base"
@@ -258,7 +265,7 @@ export default function HomePage() {
 
                     <select
                       value={language}
-                      onChange={(e) => setLanguage(e.target.value)}
+                      onChange={(e) => setLanguage(e.target.value as Language)}
                       className="w-full px-4 py-3 text-base"
                     >
                       <option value="en">🇬🇧 English</option>
@@ -268,12 +275,26 @@ export default function HomePage() {
                 )}
               </AnimatePresence>
 
+              {/* Language selector for Login view as well, so users can switch lang before logging in if they want */}
+              {isLogin && (
+                <div className="mt-4">
+                  <select
+                    value={language}
+                    onChange={(e) => setLanguage(e.target.value as Language)}
+                    className="w-full px-4 py-3 text-base bg-white/50 border-none"
+                  >
+                    <option value="en">🇬🇧 English</option>
+                    <option value="ru">🇷🇺 Русский</option>
+                  </select>
+                </div>
+              )}
+
               <button
                 type="submit"
                 disabled={isLoading}
                 className="enough-button-primary w-full py-4 text-base font-medium disabled:opacity-50 disabled:cursor-not-allowed mt-6"
               >
-                {isLoading ? 'Loading...' : isLogin ? 'Sign In' : 'Create Account'}
+                {isLoading ? t.auth.loading : isLogin ? t.auth.signInButton : t.auth.createAccountButton}
               </button>
             </form>
           </div>
@@ -287,9 +308,9 @@ export default function HomePage() {
           className="grid grid-cols-3 gap-4 mt-12 max-w-2xl"
         >
           {[
-            { icon: '✋', text: 'Say Enough' },
-            { icon: '💎', text: 'Build Wealth' },
-            { icon: '🎯', text: 'Reach Goals' },
+            { icon: '✋', text: t.features.sayEnough },
+            { icon: '💎', text: t.features.buildWealth },
+            { icon: '🎯', text: t.features.reachGoals },
           ].map((item, i) => (
             <motion.div
               key={i}

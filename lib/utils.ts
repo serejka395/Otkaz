@@ -52,6 +52,7 @@ export function requireDatabase(res: any): boolean {
 
   // Check all possible database URL environment variables
   const connectionString =
+    normalize(process.env.POSTGRES_URL) ||
     normalize(process.env.POSTGRES_PRISMA_URL) ||
     normalize(process.env.DATABASE_URL_UNPOOLED) ||
     normalize(process.env.DATABASE_URL) ||
