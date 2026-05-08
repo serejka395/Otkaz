@@ -32,8 +32,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       return res.status(404).json({ error: 'User not found' });
     }
 
-    // Проверяем текущий пароль для любых изменений
-    if (updates.password || updates.username || updates.name) {
+    // Проверяем текущий пароль для любых изменений (только если у пользователя есть пароль)
+    if ((updates.password || updates.username || updates.name) && user.password) {
       if (!currentPassword) {
         return res.status(400).json({ error: 'Current password required for security' });
       }
@@ -104,6 +104,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         email: true,
         name: true,
         username: true,
+        walletAddress: true,
         currency: true,
         language: true,
         timezone: true,

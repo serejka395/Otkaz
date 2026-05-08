@@ -6,13 +6,11 @@ import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { CURRENCIES_ARRAY } from '@/lib/currencies';
 import { useTranslation, Language } from '@/lib/i18n';
+import { TonConnectButton, useTonConnectUI } from '@tonconnect/ui-react';
 
 export default function HomePage() {
   const router = useRouter();
-  const [isLogin, setIsLogin] = useState(true);
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [name, setName] = useState('');
+  const [tonConnectUI] = useTonConnectUI();
   const [referralCode, setReferralCode] = useState('');
   const [currency, setCurrency] = useState('USD');
   const [language, setLanguage] = useState('en');
@@ -38,28 +36,25 @@ export default function HomePage() {
     }
   }, [router]);
 
-  // Handle browser language detection on first load (optional, keeping it simple for now)
-  // useEffect(() => {
-  //   const browserLang = navigator.language.split('-')[0];
-  //   if (browserLang === 'ru') setLanguage('ru');
-  // }, []);
+  useEffect(() => {
+    const unsubscribe = tonConnectUI.onStatusChange(async (wallet) => {
+      if (wallet && !isLoading) {
+        handleTonAuth(wallet.account.address);
+      }
+    });
+    return () => unsubscribe();
+  }, [tonConnectUI, isLoading]);
 
   const { t } = useTranslation(language as any);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleTonAuth = async (address: string) => {
     setIsLoading(true);
 
-    const endpoint = isLogin ? '/api/auth/login' : '/api/auth/register';
-    const body = isLogin
-      ? { email, password }
-      : { email, password, name, referralCode, currency, language };
-
     try {
-      const res = await fetch(endpoint, {
+      const res = await fetch('/api/auth/ton', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(body),
+        body: JSON.stringify({ address, referralCode, currency, language }),
       });
 
       const data = await res.json();
@@ -68,10 +63,11 @@ export default function HomePage() {
         localStorage.setItem('user', JSON.stringify(data.user));
         router.push('/calendar');
       } else {
-        alert(data.error || 'Error occurred');
+        // Only alert if it's a real error, sometimes onStatusChange triggers twice
+        if (data.error) alert(data.error);
       }
     } catch (error) {
-      alert('Network error');
+      console.error('Auth error:', error);
     } finally {
       setIsLoading(false);
     }
@@ -177,140 +173,59 @@ export default function HomePage() {
           className="w-full max-w-md"
         >
           <div
-            className="p-8 rounded-2xl"
+            className="p-10 rounded-3xl text-center"
             style={{
               background: 'rgba(255, 255, 255, 0.7)',
-              backdropFilter: 'blur(20px)',
-              WebkitBackdropFilter: 'blur(20px)',
+              backdropFilter: 'blur(30px)',
+              WebkitBackdropFilter: 'blur(30px)',
               border: '1px solid rgba(255, 255, 255, 0.8)',
               boxShadow: '0 8px 32px rgba(0, 0, 0, 0.08), 0 16px 64px rgba(0, 0, 0, 0.04)',
             }}
           >
-            {/* Tabs */}
-            <div className="flex gap-2 mb-8 p-1 rounded-xl" style={{ background: 'rgba(0, 0, 0, 0.04)' }}>
-              <button
-                onClick={() => setIsLogin(true)}
-                className={`flex-1 py-3 px-4 rounded-lg font-medium text-sm transition-all duration-200 ${isLogin
-                  ? 'bg-white text-gray-900 shadow-sm'
-                  : 'text-gray-600 hover:text-gray-900'
-                  }`}
-              >
-                {t('signInTab')}
-              </button>
-              <button
-                onClick={() => setIsLogin(false)}
-                className={`flex-1 py-3 px-4 rounded-lg font-medium text-sm transition-all duration-200 ${!isLogin
-                  ? 'bg-white text-gray-900 shadow-sm'
-                  : 'text-gray-600 hover:text-gray-900'
-                  }`}
-              >
-                {t('signUpTab')}
-              </button>
-            </div>
+            <h2 className="text-2xl font-bold text-gray-900 mb-2">{t('welcomeWallet')}</h2>
+            <p className="text-gray-600 mb-8 text-sm leading-relaxed">
+              {t('walletAuthDescription')}
+            </p>
 
-            {/* Form */}
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <AnimatePresence mode="wait">
-                {!isLogin && (
-                  <motion.div
-                    initial={{ opacity: 0, height: 0 }}
-                    animate={{ opacity: 1, height: 'auto' }}
-                    exit={{ opacity: 0, height: 0 }}
-                    transition={{ duration: 0.3 }}
-                  >
-                    <input
-                      type="text"
-                      placeholder={t('namePlaceholder')}
-                      value={name}
-                      onChange={(e) => setName(e.target.value)}
-                      className="w-full px-4 py-3 text-base"
-                      required={!isLogin}
-                    />
-                  </motion.div>
-                )}
-              </AnimatePresence>
+            <div className="flex flex-col items-center gap-6">
+              <div className="scale-125 hover:scale-130 transition-transform duration-300">
+                <TonConnectButton />
+              </div>
 
-              <input
-                type="email"
-                placeholder={t('emailPlaceholder')}
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="w-full px-4 py-3 text-base"
-                required
-              />
-
-              <input
-                type="password"
-                placeholder={t('passwordPlaceholder')}
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="w-full px-4 py-3 text-base"
-                required
-              />
-
-              <AnimatePresence mode="wait">
-                {!isLogin && (
-                  <motion.div
-                    initial={{ opacity: 0, height: 0 }}
-                    animate={{ opacity: 1, height: 'auto' }}
-                    exit={{ opacity: 0, height: 0 }}
-                    transition={{ duration: 0.3 }}
-                    className="space-y-4"
-                  >
-                    <input
-                      type="text"
-                      placeholder={t('referralPlaceholder')}
-                      value={referralCode}
-                      onChange={(e) => setReferralCode(e.target.value)}
-                      className="w-full px-4 py-3 text-base"
-                    />
-
-                    <select
-                      value={currency}
-                      onChange={(e) => setCurrency(e.target.value)}
-                      className="w-full px-4 py-3 text-base"
-                    >
-                      {CURRENCIES_ARRAY.map((curr) => (
-                        <option key={curr.code} value={curr.code}>
-                          {curr.symbol} {curr.code} - {curr.name}
-                        </option>
-                      ))}
-                    </select>
-
-                    <select
-                      value={language}
-                      onChange={(e) => setLanguage(e.target.value as Language)}
-                      className="w-full px-4 py-3 text-base"
-                    >
-                      <option value="en">🇬🇧 English</option>
-                      <option value="ru">🇷🇺 Русский</option>
-                    </select>
-                  </motion.div>
-                )}
-              </AnimatePresence>
-
-              {/* Language selector for Login view as well, so users can switch lang before logging in if they want */}
-              {isLogin && (
-                <div className="mt-4">
-                  <select
-                    value={language}
-                    onChange={(e) => setLanguage(e.target.value as Language)}
-                    className="w-full px-4 py-3 text-base bg-white/50 border-none"
-                  >
-                    <option value="en">🇬🇧 English</option>
-                    <option value="ru">🇷🇺 Русский</option>
-                  </select>
-                </div>
+              {isLoading && (
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  className="flex items-center gap-2 text-sm text-gray-500"
+                >
+                  <div className="w-4 h-4 border-2 border-yellow-500 border-t-transparent rounded-full animate-spin" />
+                  {t('connecting')}
+                </motion.div>
               )}
 
-              <button
-                type="submit"
-                disabled={isLoading}
-                className="enough-button-primary w-full py-4 text-base font-medium disabled:opacity-50 disabled:cursor-not-allowed mt-6"
-              >
-                {isLoading ? t('loading') : isLogin ? t('signInButton') : t('createAccountButton')}
-              </button>
-            </form>
+              <div className="w-full grid grid-cols-1 gap-3 mt-4">
+                <select
+                  value={currency}
+                  onChange={(e) => setCurrency(e.target.value)}
+                  className="w-full px-4 py-3 text-sm bg-white/50 border border-gray-200/50 rounded-xl focus:outline-none focus:ring-2 focus:ring-yellow-400/20 transition-all"
+                >
+                  {CURRENCIES_ARRAY.map((curr) => (
+                    <option key={curr.code} value={curr.code}>
+                      {curr.symbol} {curr.code} - {curr.name}
+                    </option>
+                  ))}
+                </select>
+
+                <select
+                  value={language}
+                  onChange={(e) => setLanguage(e.target.value as Language)}
+                  className="w-full px-4 py-3 text-sm bg-white/50 border border-gray-200/50 rounded-xl focus:outline-none focus:ring-2 focus:ring-yellow-400/20 transition-all"
+                >
+                  <option value="en">🇬🇧 English</option>
+                  <option value="ru">🇷🇺 Русский</option>
+                </select>
+              </div>
+            </div>
           </div>
         </motion.div>
 

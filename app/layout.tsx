@@ -2,6 +2,7 @@
 import type { Metadata, Viewport } from 'next';
 import './globals.css';
 import { Toaster } from 'react-hot-toast';
+import TonProvider from '@/components/TonProvider';
 
 export const metadata: Metadata = {
   title: 'Enough - Gamified Savings PWA',
@@ -33,7 +34,7 @@ export default function RootLayout({
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
       </head>
       <body className="min-h-screen" style={{ background: '#F5F5F7' }}>
-        {children}
+        <TonProvider>{children}</TonProvider>
         <Toaster 
           position="top-center"
           toastOptions={{

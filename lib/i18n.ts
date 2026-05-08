@@ -16,6 +16,10 @@ export const translations = {
     sayEnough: 'Say Enough',
     buildWealth: 'Build Wealth',
     reachGoals: 'Reach Goals',
+    connectWallet: 'Connect Wallet',
+    connecting: 'Connecting...',
+    welcomeWallet: 'Welcome back!',
+    walletAuthDescription: 'Connect your TON wallet to securely access your savings dashboard.',
 
     // Navigation
     navCalendar: 'Calendar',
@@ -185,6 +189,10 @@ export const translations = {
     sayEnough: 'Скажи Хватит',
     buildWealth: 'Создай капитал',
     reachGoals: 'Достигни целей',
+    connectWallet: 'Подключить кошелек',
+    connecting: 'Подключение...',
+    welcomeWallet: 'С возвращением!',
+    walletAuthDescription: 'Подключите ваш TON кошелек для безопасного доступа к вашим сбережениям.',
 
     // Navigation
     navCalendar: 'Календарь',

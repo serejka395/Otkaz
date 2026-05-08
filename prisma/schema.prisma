@@ -4,14 +4,15 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = env("POSTGRES_URL")
+  url      = env("POSTGRES_PRISMA_URL")
 }
 
 model User {
   id            String   @id @default(cuid())
-  email         String   @unique
-  password      String
-  name          String
+  email         String?  @unique
+  password      String?
+  walletAddress String?  @unique
+  name          String?
   username      String?  @unique
   currency      String   @default("USD")
   language      String   @default("en")
